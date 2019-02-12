@@ -52,7 +52,7 @@ export default class App extends React.Component {
           this.audioPlayer1  = soundObject;
             this.audioPlayer1.setIsLoopingAsync(true);
             this.audioPlayer1.setPositionAsync(0);
-            this.audioPlayer1.setVolumeAsync(0.8);
+            this.audioPlayer1.setVolumeAsync(0.2);
             this.audioPlayer1.playAsync();
             
           
@@ -77,7 +77,7 @@ export default class App extends React.Component {
           this.audioPlayer2  = soundObject;
             this.audioPlayer2.setIsLoopingAsync(true);
             this.audioPlayer2.setPositionAsync(0);
-            this.audioPlayer2.setVolumeAsync(0.8);
+            this.audioPlayer2.setVolumeAsync(1);
             this.audioPlayer2.playAsync();
             
           
@@ -136,7 +136,7 @@ export default class App extends React.Component {
   async _loadAssetsAsync() {
       const imageAssets = cacheImages([
           
-          require('./assets/videos/giphy.gif'),
+          require('./assets/icon.png'),
           require('./assets/audio/intro.mp3'),
           require('./assets/audio/main.mp3'),
       ]);
@@ -157,13 +157,21 @@ export default class App extends React.Component {
     this.camera = new THREE.PerspectiveCamera(75, deviceWidth / deviceHeight, 0.1, 1000);
     this.camera.position.z = 6;
     
-    const texture = await ExpoTHREE.loadAsync(require('./assets/videos/giphy.gif'));
+    const texture = await ExpoTHREE.loadAsync(require('./assets/icon.png'));
       texture.needsupdate = true;
       texture.minFilter = THREE.LinearFilter;
       texture.magFilter = THREE.LinearFilter
-      // texture.format = THREE.RGBFormat;
+      
 
-    const flakeGeometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+    const texture2 = await ExpoTHREE.loadAsync(require('./assets/giphy.gif'));
+      texture2.needsupdate = true;
+      texture2.minFilter = THREE.LinearFilter;
+      texture2.magFilter = THREE.LinearFilter
+
+    const flakeGeometry = new THREE.SphereGeometry( 0.10, 32, 32, 6, 6.3);
+    const flakeGeometry2 = new THREE.TorusBufferGeometry( 1, 0.3, 30, 600, 6.3);
+    const flakeMaterial2 = new THREE.MeshPhongMaterial({map:texture2});
+
     const flakeMaterial = new THREE.MeshPhongMaterial({map:texture});
     flakeMaterial.map.needsUpdate = true;
     const flakeCount = 9000;
@@ -177,10 +185,27 @@ export default class App extends React.Component {
       );
       snow.add(flakeMesh);
     }
+    const flakeCount2 = 90;
+    const snow2 = new THREE.Group();
+    for (let i = 0; i < flakeCount2; i++) {
+      const flakeMesh2 = new THREE.Mesh(flakeGeometry2, flakeMaterial2);
+      flakeMesh2.transparent = true;
+      flakeMesh2.side = THREE.DoubleSide;
+      flakeMesh2.position.set(
+        z = 0.6,
+        y = 0.10,
+        x = 0.33
+      );
+      snow2.add(flakeMesh2);
+    }
+
     
+
+    this.cube2 = snow2;
     this.cube = snow;
     flakeArray = this.cube.children;
-    this.scene.add(this.cube);
+    flakeArray2 = this.cube2.children;
+    this.scene.add(this.cube, this.cube2);
     
 
     this.scene.add(new THREE.AmbientLight(0x404040));
@@ -192,13 +217,13 @@ export default class App extends React.Component {
 
 
   onPress = delta => {
-    for (i = 0; i < flakeArray.length / 2; i++) {
-       flakeArray[i].rotation.y += 0.01;
-       flakeArray[i].rotation.x += 0.02;
-       flakeArray[i].rotation.z += 0.03;
-       flakeArray[i].position.y -= 1;
-       if (flakeArray[i].position.y < -6) {
-         flakeArray[i].position.y += 100;
+    for (i = 0; i < flakeArray2.length / 2; i++) {
+       flakeArray2[i].rotation.y += 0.01;
+       flakeArray2[i].rotation.x += 0.02;
+       flakeArray2[i].rotation.z += 0.03;
+       flakeArray2[i].position.y -= 1;
+       if (flakeArray2[i].position.y < -9) {
+         flakeArray2[i].position.y += 10;
        }
      }
      for (i = flakeArray.length / 2; i < flakeArray.length; i++) {
@@ -207,7 +232,7 @@ export default class App extends React.Component {
        flakeArray[i].rotation.z -= 0.02;
        flakeArray[i].position.y -= 0.1;
        if (flakeArray[i].position.y < -6) {
-         flakeArray[i].position.y += 35;
+         flakeArray[i].position.y += 5;
        }
 
        this.cube.rotation.y += 0.000009;
